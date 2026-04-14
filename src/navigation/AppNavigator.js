@@ -1,0 +1,88 @@
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { useState } from "react";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { Ionicons } from "@expo/vector-icons";
+
+import HomeScreen from "../screens/HomeScreen";
+import ProductListScreen from "../screens/ProductListScreen";
+import CartScreen from "../screens/CartScreen";
+import ProfileScreen from "../screens/ProfileScreen";
+import ProductDetailScreen from "../screens/ProductDetailScreen";
+import OfertasScreen from "../screens/OfertasScreen";
+
+const Stack = createNativeStackNavigator();
+const Tab = createBottomTabNavigator();
+
+function HomeStack({ cart, setCart }) {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name="HomeScreen"
+        component={HomeScreen}
+        options={{ title: "Inicio" }}
+      />
+      <Stack.Screen
+        name="ProductList"
+        options={{ title: "Productos" }}
+      >
+        {(props) => <ProductListScreen {...props} cart={cart} setCart={setCart} />}
+      </Stack.Screen>
+      <Stack.Screen
+        name="ProductDetail"
+        options={{ title: "Detalle del Producto" }}
+      >
+        {(props) => <ProductDetailScreen {...props} cart={cart} setCart={setCart} />}
+      </Stack.Screen>
+    </Stack.Navigator>
+  );
+}
+
+export default function AppNavigator()  {
+  const [cart, setCart] = useState([]);
+  return (
+    <NavigationContainer>
+      <Tab.Navigator
+        screenOptions={({ route }) => ({
+          tabBarIcon: ({ color, size }) => {
+            let iconName;
+
+            if (route.name === "Inicio") {
+              iconName = "home";
+            } else if (route.name === "Carrito") {
+              iconName = "cart";
+            } else if (route.name === "Perfil") {
+              iconName = "person";
+            } else if (route.name === "Ofertas") {
+              iconName = "pricetag";
+            }
+
+            return <Ionicons name={iconName} size={size} color={color} />;
+          },
+          tabBarActiveTintColor: "#8000",
+          tabBarInactiveTintColor: "gray",
+        })}
+      >
+        <Tab.Screen 
+          name="Inicio" 
+          options={{ headerShown: false }}
+        >
+          {(props) => <HomeStack cart={cart} setCart={setCart} />}
+        </Tab.Screen>
+        <Tab.Screen 
+          name="Ofertas"
+        >
+          {(props) => <OfertasScreen {...props} cart={cart} setCart={setCart} />}
+        </Tab.Screen>
+        <Tab.Screen 
+          name="Carrito">
+          {(props) => <CartScreen {...props} cart={cart} setCart={setCart} />}
+        </Tab.Screen>
+        <Tab.Screen 
+          name="Perfil" 
+          component={ProfileScreen} 
+        />
+      </Tab.Navigator>
+    </NavigationContainer>
+  );
+}
